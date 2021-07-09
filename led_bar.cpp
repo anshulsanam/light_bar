@@ -7,9 +7,7 @@
 #include <linux/types.h>
 #include <iostream>
 
-#include "spi.h"
 #include "led_bar.h"
-#include "color.h"
 
 using namespace std;
 
@@ -58,11 +56,11 @@ int32_t led_bar::get_LED_len() {
     return led_len;
 }
 
-int led_bar::get_width() {
+int32_t led_bar::get_width() {
     return width;
 }
 
-int led_bar::get_height() {
+int32_t led_bar::get_height() {
     return height;
 }
 
@@ -84,12 +82,16 @@ void led_bar::write_to_LEDs() {
         led_bar_connection.transmit(finish, 1);
 };
 
-void led_bar::set_LED_RGB(uint8_t idx, uint8_t brightness, uint8_t red, uint8_t green, uint8_t blue) {
+void led_bar::set_LED_RGB(int32_t idx, uint8_t brightness, uint8_t red, uint8_t green, uint8_t blue) {
+    uint8_t blue_g8 = gamma8[blue];
+    uint8_t green_g8 = gamma8[green];
+    uint8_t red_g8 = gamma8[red];
+
     led color = {
         .brightness = brightness,
-        .blue = blue,
-        .green = green,
-        .red = red,
+        .blue = blue_g8,
+        .green = green_g8,
+        .red = red_g8,
     };
     color.brightness |= 0xE0;
 
@@ -100,7 +102,7 @@ void led_bar::set_LED_RGB(uint8_t idx, uint8_t brightness, uint8_t red, uint8_t 
     
 }
 
-void led_bar::set_LED_HSV(uint8_t idx, uint8_t brightness, uint8_t h, uint8_t s, uint8_t v) {
+void led_bar::set_LED_HSV(int32_t idx, uint8_t brightness, uint8_t h, uint8_t s, uint8_t v) {
     color color_hsv(h, s, v);
     RGB color_RGB;
     
@@ -125,6 +127,16 @@ void led_bar::set_LED_HSV(uint8_t idx, uint8_t brightness, uint8_t h, uint8_t s,
     
 }
 
+// uint8_t led_bar::get_LED_hue(int32_t idx) {
+//     return led_bar_data
+// }
+// uint8_t led_bar::get_LED_sat(int32_t idx) {
+
+// }
+// uint8_t led_bar::get_LED_val(int32_t idx) {
+
+// }
+
 void led_bar::shift_all_once(int dir) {
     uint8_t i = 0;
 	led buff;
@@ -144,22 +156,21 @@ void led_bar::shift_all_once(int dir) {
 	}
 }
 
-// void led_bar::scanning_bar() {
-//     int32_t half_count = floor((led_len - 1) / 2);
+void led_bar::backup() {
+    backup_bar_data = new led[get_LED_len()];
 
-//     int32_t start_sectionA = 0;
-//     int32_t start_sectionB = led_len - 1;
+    for (int i = 0; i < get_LED_len(); i++)
+        backup_bar_data[i] = led_bar_data[i];
 
-//     int32_t end_sectionA = half_count;
-//     int32_t end_sectionB = half_count + 1;
+}
 
-//     int32_t leaderA = start_sectionA;
-//     int32_t leaderB = start_sectionB;
 
-//     int directionA = 1;
-//     int directionB = -1;
-    
-// }
+void led_bar::restore() {
+    for (int i = 0; i < get_LED_len(); i++)
+        led_bar_data[i] = backup_bar_data[i];
+
+    delete[] backup_bar_data;
+}
 
 led_bar::~led_bar() {
     delete[] led_bar_data;

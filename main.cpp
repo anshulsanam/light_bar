@@ -7,43 +7,25 @@
 #include <unistd.h>
 
 
-#include "spi.h"
 #include "led_bar.h"
 #include "color.h"
+#include "pattern.h"
 
-using namespace std::chrono;
 using namespace std;
 
 
-int main() {
-    int fd;
-    uint8_t start[4] = {0x0, 0x0, 0x0, 0x0};
-    uint8_t test_payload[4] = {0xE0, 0x00, 0x00, 0x00};
-    uint8_t finish[4] = {0xFF, 0xFF, 0xFF, 0xFF};
-    
+int main() {    
 
     led_bar bar(66, 6);
-
-
-    // int32_t led_len = bar.get_LED_len();
-    // int32_t i = 0;
-
-    // while (true) {
-    //     for (int k = 0; k < 66; k++) {
-    //         bar.set_LED_HSV(k, 31, (i + static_cast<int>((k / static_cast<float>(led_len)) * 255)) % 255, 255, 255);
-    //         bar.set_LED_HSV(143 - 6 - k, 31, (i + static_cast<int>((k / static_cast<float>(led_len)) * 255)) % 255, 255, 255);
-    //     }
-
-    //     bar.write_to_LEDs();
-    //     i++;
-    //     this_thread::sleep_for(std::chrono::milliseconds(5));
-    // }
-
-    // for (int k = 0; k < led_len; k++) {
-    //     bar.set_LED_HSV(k, 31, static_cast<int>((k / static_cast<float>(led_len)) * 255), 255, 255);
-    // }
-    // bar.write_to_LEDs();
-
+    pattern led_bar_patterns(&bar);
+    // led_bar_patterns.scanning_rainbow();
+    // led_bar_patterns.rotating_rainbow();
+    // led_bar_patterns.scanning_effect(2, 1, 2, 74, 100);
+    // led_bar_patterns.strobe_effect(50, 0, 0, 100);
+    // led_bar_patterns.lakers_theme(0);
+    // led_bar_patterns.sparkfire(30, 160, 20);
+    // led_bar_patterns.random_color(144, 50);
+    // led_bar_patterns.gaussian(0, 1, 29, 83, 100);
   
 
     return 0;
